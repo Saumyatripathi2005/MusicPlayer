@@ -93,9 +93,9 @@ Simply copy audio files to the `music/` directory. The app will:
 ## Troubleshooting
 
 ### Port Already in Use
-If port 3000 is busy, you can change it in `server.js`:
+If port 2050 is busy, you can change it in `server.js`:
 ```javascript
-const PORT = 3001; // Change to any available port
+const PORT = 2050; // Change to any available port
 ```
 
 ### Music Files Not Loading
