@@ -25,25 +25,18 @@ function fillSymbolContainer(container, count=5) {
   }
 }
 
-// Example to simulate fetching music list dynamically
-// In real environment, likely fetch '/music/songs.json' or server endpoint that returns 
-// JSON array of {title, artist, file} objects.
-// Here we simulate with a static array for demo purpose.
+// Fetch songs from API
 async function fetchSongs() {
   try {
-    // Uncomment this when actual JSON endpoint is available:
-    // const response = await fetch('music/songs.json');
-    // if (!response.ok) throw new Error('Failed to fetch songs metadata');
-    // const songs = await response.json();
-    // return songs;
-
-    // Demo static list:
-    return [
-      {title: "Night Drive", artist: "Aether", file: "music/night_drive.mp3"},
-      {title: "Sunset Roads", artist: "Vastlane", file: "music/sunset_roads.mp3"},
-      {title: "Midnight Jazz", artist: "The Skyliners", file: "music/midnight_jazz.mp3"},
-      {title: "Aurora Dreams", artist: "Nora Nova", file: "music/aurora_dreams.mp3"}
-    ];
+    const response = await fetch('/api/songs');
+    if (!response.ok) throw new Error('Failed to fetch songs from API');
+    const data = await response.json();
+    
+    if (data.success) {
+      return data.songs;
+    } else {
+      throw new Error(data.error || 'Failed to fetch songs');
+    }
   } catch (err) {
     console.error('Error fetching songs:', err);
     return [];
@@ -194,6 +187,106 @@ function formatTime(seconds) {
   return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
+// Auto-update functionality to scan for new songs
+let autoUpdateInterval = null;
+
+// Function to update songs.json with new files
+async function updateSongsJson(newFiles) {
+  try {
+    // Use the auto-update API endpoint
+    const response = await fetch('/api/auto-update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) throw new Error('Failed to auto-update songs');
+    
+    const data = await response.json();
+    
+    if (data.success && (data.newSongs > 0 || data.deletedSongs > 0)) {
+      if (data.newSongs > 0) {
+        console.log(`Found ${data.newSongs} new song(s):`, data.addedFiles);
+      }
+      if (data.deletedSongs > 0) {
+        console.log(`Removed ${data.deletedSongs} deleted song(s):`, data.deletedFiles);
+      }
+      
+      // Update the local songs array and re-render
+      songs = data.songs;
+      renderMusicGrid(songs);
+      
+      // Check if currently playing song was deleted
+      if (data.deletedSongs > 0 && songs.length > 0) {
+        const currentSong = songs[currentIdx];
+        if (!currentSong) {
+          // Current song was deleted, play the first available song
+          currentIdx = 0;
+          playSong(0);
+        }
+      }
+      
+      // If no song is currently playing and we have songs, start playing the first one
+      if (audio.paused && songs.length > 0) {
+        playSong(0);
+      }
+      
+      // If all songs were deleted, stop playback
+      if (songs.length === 0) {
+        audio.pause();
+        audio.src = '';
+        currentIdx = 0;
+        // Clear the UI
+        const grid = document.getElementById('musicGrid');
+        if (grid) grid.innerHTML = '<p style="text-align: center; color: #ccc; margin-top: 50px;">No music files found. Add some audio files to the music/ directory!</p>';
+      }
+      
+      return true; // Indicates update occurred
+    }
+    
+    return false; // No updates needed
+  } catch (err) {
+    console.error('Error updating songs.json:', err);
+    return false;
+  }
+}
+
+// Main auto-update function that runs every 1000ms
+async function autoUpdateMusicLibrary() {
+  try {
+    const wasUpdated = await updateSongsJson();
+    
+    if (wasUpdated) {
+      console.log('Music library updated successfully');
+    }
+  } catch (err) {
+    console.error('Error in auto-update:', err);
+  }
+}
+
+// Function to start auto-update monitoring
+function startAutoUpdate() {
+  if (autoUpdateInterval) {
+    clearInterval(autoUpdateInterval);
+  }
+  
+  console.log('Starting auto-update monitoring (every 1000ms)...');
+  autoUpdateInterval = setInterval(autoUpdateMusicLibrary, 1000);
+  
+  // Run once immediately
+  autoUpdateMusicLibrary();
+}
+
+// Function to stop auto-update monitoring
+function stopAutoUpdate() {
+  if (autoUpdateInterval) {
+    clearInterval(autoUpdateInterval);
+    autoUpdateInterval = null;
+    console.log('Auto-update monitoring stopped');
+  }
+}
+
 // Initialize player after DOM loaded
 window.addEventListener('DOMContentLoaded', async () => {
   songs = await fetchSongs();
@@ -202,4 +295,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (songs.length > 0) {
     playSong(0);
   }
+
+  // Start auto-update for music library
+  startAutoUpdate();
 });

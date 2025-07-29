@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime files
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Music files (add your own music)
+music/*.mp3
+music/*.wav
+music/*.flac
+music/*.m4a
+music/*.ogg
+music/*.aac
+music/*.wma
+
+# Keep the songs.json structure but not the actual file
+music/songs.json
+
+# Keep the music directory
+!music/.gitkeep
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

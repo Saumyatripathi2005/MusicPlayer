@@ -39,7 +39,7 @@ body {
   background: rgba(30,0,0,0.85);
   box-shadow: 0 4px 20px rgba(0,0,0,.25);
   backdrop-filter: var(--navbar-blur);
-  padding: 0 2.5rem;
+  padding: 0 0 0 0;
   height: 65px;
   animation: fade-in 1.1s both;
 }
@@ -49,6 +49,7 @@ body {
   font-weight: bold;
   font-size: 1.8em;
   letter-spacing: 2px;
+  margin-left: 2.5rem;  
 }
 
 .logo span {
@@ -56,25 +57,17 @@ body {
   font-weight: normal;
 }
 
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 1.75rem;
-  margin-right: 1rem;
-}
-
-.nav-links li a {
+.made-by {
   color: #eee;
-  text-decoration: none;
   font-size: 1.1em;
-  position: relative;
-  padding: 6px 0;
-  transition: color 0.2s;
+  font-weight: 300;
+  margin-right: 2.5rem;
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
 
-.nav-links li a.active,
-.nav-links li a:hover {
-  color: var(--primary);
+.made-by:hover {
+  opacity: 1;
 }
 
 main {
@@ -107,7 +100,7 @@ main {
   transition: transform 0.16s, box-shadow 0.18s;
   position: relative;
   overflow: hidden;
-  animation: fade-in 1.2s;
+  animation: fade-in 1.2s both;
   color: #fff;
   user-select: none;
 }
@@ -176,7 +169,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 2rem;
+  padding: 10px 0 10px 0;
   gap: 1.6rem;
   animation: fade-in 1s both;
   user-select: none;
@@ -188,6 +181,7 @@ main {
   align-items: center;
   min-width: 0;
   gap: 1rem;
+  padding: 0 1rem;
 }
 
 /* Symbol container inside player details */
@@ -259,6 +253,7 @@ main {
   gap: 0.6rem;
   justify-content: flex-end;
   min-width: 130px;
+  padding: 0 1rem;
 }
 
 .player-progress input[type="range"] {
@@ -330,4 +325,41 @@ main {
     width: var(--blocksize);
     height: var(--blocksize);
   }
+}
+
+
+footer {
+  width:100vw;
+  height:50px;
+  background:rgba(30,0,0,0.85);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f44336;
+  font-size: 1.08em;
+  letter-spacing:1px;
+  position:fixed;
+  bottom: 0;
+  left:0;
+  z-index: 10;
+  backdrop-filter: var(--navbar-blur);
+  animation: fade-in 1.7s both;
+}
+
+
+.about-section {
+  max-width:800px;
+  background:rgba(34,15,19,0.69);
+  margin: 60px auto 0 auto;
+  border-radius:22px;
+  padding:44px 34px;
+  box-shadow:0 14px 33px rgba(0,0,0,0.23);
+  animation: fade-in 1.5s both;
+}
+@media (max-width: 800px){
+  .music-grid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:23px;}
+  .music-block{width:120px;height:120px;}
+  .player-bar{flex-direction:column;align-items:stretch;gap:10px;padding:15px 5vw;}
+  .player-details{flex-basis:unset;}
+  .player-progress{flex-basis:unset;}
 }
